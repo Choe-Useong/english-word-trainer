@@ -1,23 +1,50 @@
-# ¿µ´Ü¾î ÇĞ½À µµ±¸
+ï»¿# English Word Trainer
 
-Tkinter ±â¹İ ¿µ¾î ´Ü¾î ÇĞ½À ÇÁ·Î±×·¥ÀÔ´Ï´Ù.
+Tkinter-based desktop app for practicing English vocabulary with Korean prompts. The UI loads word lists from Excel, tracks study progress, and supports packaging into a standalone Windows executable.
 
-## ±â´É
-- ¿¢¼¿¿¡¼­ ´Ü¾î ¸ñ·Ï ºÒ·¯¿À±â
-- ³­ÀÌµµ ¹× Áøµµ °ü¸®
-- GUI¸¦ ÅëÇÑ ÇĞ½À ¼¼¼Ç
-- PyInstaller·Î .exe ºôµå
+## Features
+- Load vocabulary rows from Excel (`ì˜ë‹¨ì–´/*.xlsx`)
+- Track quiz progress (tries, fails, levels, session metadata)
+- Interactive Tkinter study session with chapter or count filtering
+- PyInstaller build script for producing distributable executables
 
-## ½ÇÇà ¹æ¹ı
-`ash
-python ¿µ´Ü¾î_ui.py
-`
+## Project Structure
+- `ì˜ë‹¨ì–´_ui.py` - Tkinter GUI entry point that orchestrates study sessions
+- `ì˜ë‹¨ì–´.py` - Core logic for locating Excel files, managing state columns, and scoring words
+- `build_exe.py` - PyInstaller helper that builds and copies release artifacts
+- `release/` - Generated release-ready zip/exe bundles (ignored by Git)
+- `dist/`, `build/`, `__pycache__/` - Intermediate build and cache folders (ignored by Git)
 
-## ºôµå
-`ash
+## Prerequisites
+- Windows with Python 3.10 or newer
+- Excel vocabulary file placed in the `ì˜ë‹¨ì–´` directory (default expects `ì˜ë‹¨ì–´/ì˜ë‹¨ì–´.xlsx`)
+- Install dependencies: `pip install -r requirements.txt`
+
+## Running the App
+```bash
+python ì˜ë‹¨ì–´_ui.py
+```
+
+### Configuration
+Adjust the values in `ì˜ë‹¨ì–´.py` to fine-tune study behavior:
+- `CHAPTER_SPEC`, `FILTER_MODE`, `COUNT_SPEC` - select study range
+- `PRIOR_MAP` - adjust weighting for word difficulty levels
+- `MIN_FAILS_FOR_STEP_UP`, `MAX_FAIL_GAP` - control level progression thresholds
+
+## Building the Executable
+```bash
 python build_exe.py
-`
+```
+The script runs PyInstaller, then copies the output into `release/` with a timestamped folder. Distribute the executable together with the Excel data (`ì˜ë‹¨ì–´` directory or the same folder as the EXE) so the app can find the word list.
 
-## ÁÖÀÇ
-- ¿µ´Ü¾î Æú´õ¿¡ ¿¢¼¿ ÆÄÀÏÀ» ³Ö¾î¾ß ÇÕ´Ï´Ù.
-- uild/, dist/, elease/ Æú´õ´Â ÀÚµ¿ »ı¼ºµË´Ï´Ù.
+## Working with Git
+1. Stage changes: `git add .`
+2. Commit: `git commit -m "Describe change"`
+3. Push: `git push`
+
+Remote repository: `https://github.com/Choe-Useong/english-word-trainer.git`.
+
+## Next Ideas
+- Add automated tests around the data loading and scoring logic in `ì˜ë‹¨ì–´.py`
+- Publish the `release/` output as GitHub Releases for easier downloads
+- Add a GitHub Actions workflow that runs the build script on push
