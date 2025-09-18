@@ -1,50 +1,65 @@
-﻿# English Word Trainer
+﻿# 영단어 학습 도구 (English Word Trainer)
 
-Tkinter-based desktop app for practicing English vocabulary with Korean prompts. The UI loads word lists from Excel, tracks study progress, and supports packaging into a standalone Windows executable.
+로컬 엑셀 데이터를 기반으로 영어 단어를 반복 학습할 수 있는 Tkinter 데스크톱 애플리케이션입니다. 학습 기록을 저장하고 난이도를 조절하며, PyInstaller로 Windows 실행 파일(.exe)까지 배포할 수 있습니다.
 
-## Features
-- Load vocabulary rows from Excel (`영단어/*.xlsx`)
-- Track quiz progress (tries, fails, levels, session metadata)
-- Interactive Tkinter study session with chapter or count filtering
-- PyInstaller build script for producing distributable executables
+## 주요 기능
+- `영단어/*.xlsx` 엑셀에서 단어 목록 불러오기
+- 시도/오답/레벨 등 학습 상태 추적 및 난이도 조정
+- 챕터 또는 단어 수 기준으로 학습 범위를 필터링
+- PyInstaller를 이용해 단일 실행 파일(EXE) 생성
 
-## Project Structure
-- `영단어_ui.py` - Tkinter GUI entry point that orchestrates study sessions
-- `영단어.py` - Core logic for locating Excel files, managing state columns, and scoring words
-- `build_exe.py` - PyInstaller helper that builds and copies release artifacts
-- `release/` - Generated release-ready zip/exe bundles (ignored by Git)
-- `dist/`, `build/`, `__pycache__/` - Intermediate build and cache folders (ignored by Git)
+## 폴더 구성
+- `영단어_ui.py` : Tkinter GUI 진입점
+- `영단어.py` : 엑셀 로드, 학습 상태 컬럼 보장, 난이도 계산 로직
+- `build_exe.py` : PyInstaller 빌드 스크립트 (EXE 생성 및 산출물 복사)
+- `program/` : 배포용 실행 파일과 데이터(엑셀, 사용법 안내)가 들어 있는 폴더
+  - `영단어_ui.exe` : 실행 파일
+  - `영단어/` : 실행 시 참조할 엑셀 데이터 폴더
+  - `사용방법.txt` : 최종 사용자용 간단 가이드
+- `build/`, `dist/`, `__pycache__/` : 빌드/캐시 폴더 (Git에서 무시)
 
-## Prerequisites
-- Windows with Python 3.10 or newer
-- Excel vocabulary file placed in the `영단어` directory (default expects `영단어/영단어.xlsx`)
-- Install dependencies: `pip install -r requirements.txt`
+## 사전 준비
+- Windows + Python 3.10 이상
+- `pip install -r requirements.txt` 로 의존성 설치 (현재 `pandas`)
+- 학습할 엑셀 파일을 `영단어` 폴더에 배치 (기본 파일명 `영단어/영단어.xlsx`)
 
-## Running the App
+## 파이썬으로 실행하기
 ```bash
 python 영단어_ui.py
 ```
+- 실행 후 챕터/개수 필터를 설정하고 학습 세션을 시작합니다.
+- 설정 값은 `영단어.py`의 상수(`CHAPTER_SPEC`, `FILTER_MODE`, `COUNT_SPEC` 등)를 수정해 조정합니다.
 
-### Configuration
-Adjust the values in `영단어.py` to fine-tune study behavior:
-- `CHAPTER_SPEC`, `FILTER_MODE`, `COUNT_SPEC` - select study range
-- `PRIOR_MAP` - adjust weighting for word difficulty levels
-- `MIN_FAILS_FOR_STEP_UP`, `MAX_FAIL_GAP` - control level progression thresholds
+### 주요 설정 값 (`영단어.py`)
+- `CHAPTER_SPEC`, `FILTER_MODE`, `COUNT_SPEC` : 학습 범위 정의
+- `PRIOR_MAP` : 난이도별 가중치 조정
+- `MIN_FAILS_FOR_STEP_UP`, `MAX_FAIL_GAP` : 레벨 상승/하락 조건
 
-## Building the Executable
+## 실행 파일(program 폴더) 사용법
+1. `program` 폴더 전체를 원하는 위치로 복사합니다.
+2. `영단어` 하위 폴더에 학습용 엑셀 파일을 넣거나 기존 파일을 덮어씁니다.
+3. `영단어_ui.exe`를 실행합니다.
+4. `사용방법.txt`에 요약된 사용 절차를 참고하세요.
+
+> **TIP**: exe와 엑셀 폴더는 항상 같은 상위 폴더(`program`) 아래에 있어야 합니다. 엑셀 파일 이름이 다르면 `영단어.py`의 `resolve_excel_path` 로직을 참고해 맞춰 주세요.
+
+## 실행 파일 직접 빌드하기
 ```bash
 python build_exe.py
 ```
-The script runs PyInstaller, then copies the output into `release/` with a timestamped folder. Distribute the executable together with the Excel data (`영단어` directory or the same folder as the EXE) so the app can find the word list.
+- PyInstaller가 실행되며 `dist/영단어_ui.exe`를 생성합니다.
+- 스크립트가 자동으로 `program/` 폴더에 최신 실행 파일과 필요한 리소스를 복사합니다.
 
-## Working with Git
-1. Stage changes: `git add .`
-2. Commit: `git commit -m "Describe change"`
-3. Push: `git push`
+## Git 사용 흐름
+1. 변경 확인 : `git status`
+2. 스테이징 : `git add <파일>` 또는 `git add .`
+3. 커밋 : `git commit -m "메시지"`
+4. 푸시 : `git push`
 
-Remote repository: `https://github.com/Choe-Useong/english-word-trainer.git`.
+원격 저장소: `https://github.com/Choe-Useong/english-word-trainer.git`
 
-## Next Ideas
-- Add automated tests around the data loading and scoring logic in `영단어.py`
-- Publish the `release/` output as GitHub Releases for easier downloads
-- Add a GitHub Actions workflow that runs the build script on push
+## 향후 개선 아이디어
+- `영단어.py` 코어 로직에 대한 단위 테스트 추가
+- `program/` 폴더를 자동으로 압축하여 GitHub Release에 업로드하는 워크플로
+- GitHub Actions로 PyInstaller 빌드 자동화
+- 엑셀 파일 포맷(컬럼명, 데이터 예시)을 README에 도표로 정리
