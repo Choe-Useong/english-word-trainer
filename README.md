@@ -4,54 +4,47 @@
 
 ## 주요 기능
 - `영단어/*.xlsx` 엑셀에서 단어 목록 불러오기
-- 시도/오답/레벨 등 학습 상태 추적 및 난이도 조정
-- 챕터 또는 단어 수 기준으로 학습 범위를 필터링
-- PyInstaller를 이용해 단일 실행 파일(EXE) 생성
+- 시도/오답/레벨 등 학습 상태를 누적 추적
+- 챕터 또는 단어 수 기준으로 학습 범위 필터링
+- PyInstaller 빌드 스크립트 한 번으로 실행 파일 생성
 
-## 폴더 구성
+## 코드 구성
 - `영단어_ui.py` : Tkinter GUI 진입점
-- `영단어.py` : 엑셀 로드, 학습 상태 컬럼 보장, 난이도 계산 로직
-- `build_exe.py` : PyInstaller 빌드 스크립트 (EXE 생성 및 산출물 복사)
-- `program/` : 배포용 실행 파일과 데이터(엑셀, 사용법 안내)가 들어 있는 폴더
-  - `영단어_ui.exe` : 실행 파일
-  - `영단어/` : 실행 시 참조할 엑셀 데이터 폴더
-  - `사용방법.txt` : 최종 사용자용 간단 가이드
-- `build/`, `dist/`, `__pycache__/` : 빌드/캐시 폴더 (Git에서 무시)
+- `영단어.py` : 엑셀 로드, 학습 상태 컬럼 보정, 난이도 계산 로직
+- `build_exe.py` : PyInstaller 빌드를 수행하고 산출물을 복사
+- `requirements.txt` : 필요한 파이썬 의존성 (현재 `pandas`)
+
+> `program/`, `dist/`, `build/` 등 빌드 산출물은 Git에 포함하지 않습니다. 필요 시 `build_exe.py`로 다시 생성하세요.
 
 ## 사전 준비
-- Windows + Python 3.10 이상
-- `pip install -r requirements.txt` 로 의존성 설치 (현재 `pandas`)
-- 학습할 엑셀 파일을 `영단어` 폴더에 배치 (기본 파일명 `영단어/영단어.xlsx`)
+1. Windows + Python 3.10 이상 설치
+2. `pip install -r requirements.txt`
+3. 학습용 엑셀 파일을 `영단어` 폴더에 배치 (기본 이름 `영단어/영단어.xlsx`)
 
 ## 파이썬으로 실행하기
 ```bash
 python 영단어_ui.py
 ```
 - 실행 후 챕터/개수 필터를 설정하고 학습 세션을 시작합니다.
-- 설정 값은 `영단어.py`의 상수(`CHAPTER_SPEC`, `FILTER_MODE`, `COUNT_SPEC` 등)를 수정해 조정합니다.
+- 기본 설정은 `영단어.py` 상단의 상수(`CHAPTER_SPEC`, `FILTER_MODE`, `COUNT_SPEC` 등)를 수정해 조정할 수 있습니다.
 
-### 주요 설정 값 (`영단어.py`)
-- `CHAPTER_SPEC`, `FILTER_MODE`, `COUNT_SPEC` : 학습 범위 정의
-- `PRIOR_MAP` : 난이도별 가중치 조정
-- `MIN_FAILS_FOR_STEP_UP`, `MAX_FAIL_GAP` : 레벨 상승/하락 조건
-
-## 실행 파일(program 폴더) 사용법
-1. `program` 폴더 전체를 원하는 위치로 복사합니다.
-2. `영단어` 하위 폴더에 학습용 엑셀 파일을 넣거나 기존 파일을 덮어씁니다.
-3. `영단어_ui.exe`를 실행합니다.
-4. `사용방법.txt`에 요약된 사용 절차를 참고하세요.
-
-> **TIP**: exe와 엑셀 폴더는 항상 같은 상위 폴더(`program`) 아래에 있어야 합니다. 엑셀 파일 이름이 다르면 `영단어.py`의 `resolve_excel_path` 로직을 참고해 맞춰 주세요.
-
-## 실행 파일 직접 빌드하기
+## 실행 파일 빌드하기
 ```bash
 python build_exe.py
 ```
-- PyInstaller가 실행되며 `dist/영단어_ui.exe`를 생성합니다.
-- 스크립트가 자동으로 `program/` 폴더에 최신 실행 파일과 필요한 리소스를 복사합니다.
+- PyInstaller가 `dist/영단어_ui.exe`를 생성합니다.
+- 스크립트가 최신 실행 파일과 엑셀 폴더를 `program/` 디렉터리로 복사합니다.
+- `program/` 폴더는 재배포용이며 Git에는 커밋하지 않습니다.
+
+## 배포(Release) 절차
+1. `build_exe.py` 실행으로 `program/`을 생성합니다.
+2. `program` 폴더를 압축해 `program.zip`을 만듭니다. (PowerShell: `Compress-Archive -Path program -DestinationPath program.zip -Force`)
+3. GitHub 저장소 > **Releases** > **Draft a new release**로 이동합니다.
+4. 태그(예: `v1.0.0`)와 제목, 변경 사항을 작성하고 `program.zip`을 첨부(Assets)한 뒤 Publish 합니다.
+5. README에 최신 릴리스 링크를 안내하거나 필요 시 업데이트합니다.
 
 ## Git 사용 흐름
-1. 변경 확인 : `git status`
+1. 상태 확인 : `git status`
 2. 스테이징 : `git add <파일>` 또는 `git add .`
 3. 커밋 : `git commit -m "메시지"`
 4. 푸시 : `git push`
@@ -59,7 +52,7 @@ python build_exe.py
 원격 저장소: `https://github.com/Choe-Useong/english-word-trainer.git`
 
 ## 향후 개선 아이디어
-- `영단어.py` 코어 로직에 대한 단위 테스트 추가
-- `program/` 폴더를 자동으로 압축하여 GitHub Release에 업로드하는 워크플로
-- GitHub Actions로 PyInstaller 빌드 자동화
-- 엑셀 파일 포맷(컬럼명, 데이터 예시)을 README에 도표로 정리
+- `영단어.py` 핵심 로직에 대한 단위 테스트 추가
+- GitHub Actions 워크플로를 통해 빌드 & 릴리스 자동화
+- 엑셀 포맷(컬럼명, 예시 데이터)을 README에 도표로 정리
+- 학습 기록을 CSV/JSON으로 내보내는 기능 추가

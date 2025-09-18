@@ -10,3 +10,6 @@ release/
 .DS_Store
 Thumbs.db
 
+program/
+program.zip
+
